@@ -1,0 +1,13 @@
+-c prod.txt
+mypy
+jupyterlab
+nbdev
+
+black
+pycodestyle
+pydocstyle
+pylint
+pytest
+pyyaml
+
+wandb
