@@ -2,7 +2,16 @@
 
 __all__ = ["index", "modules", "custom_doc_links", "git_url"]
 
-index = {}
+index = {"source": "01_noisyimagenette.ipynb",
+         "csv_file": "01_noisyimagenette.ipynb",
+         "lbl_dict": "01_noisyimagenette.ipynb",
+         "get_dls": "01_noisyimagenette.ipynb",
+         "dls_5": "01_noisyimagenette.ipynb",
+         "learn_5": "01_noisyimagenette.ipynb",
+         "train_preds": "01_noisyimagenette.ipynb",
+         "val_preds": "01_noisyimagenette.ipynb",
+         "train_ordered_label_errors": "01_noisyimagenette.ipynb",
+         "noisy_train": "01_noisyimagenette.ipynb"}
 
 modules = ["noisyimagenette.py"]
 
