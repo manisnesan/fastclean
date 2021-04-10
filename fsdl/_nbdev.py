@@ -9,11 +9,21 @@ index = {"source": "01_noisyimagenette.ipynb",
          "dls_5": "01_noisyimagenette.ipynb",
          "learn_5": "01_noisyimagenette.ipynb",
          "train_preds": "01_noisyimagenette.ipynb",
-         "val_preds": "01_noisyimagenette.ipynb",
+         "val_preds": "02_NoisyMitigation_using_LabelSmoothing_MNIST.ipynb",
          "train_ordered_label_errors": "01_noisyimagenette.ipynb",
-         "noisy_train": "01_noisyimagenette.ipynb"}
+         "noisy_train": "01_noisyimagenette.ipynb",
+         "path": "02_NoisyMitigation_using_LabelSmoothing_MNIST.ipynb",
+         "x": "02_NoisyMitigation_using_LabelSmoothing_MNIST.ipynb",
+         "n": "02_NoisyMitigation_using_LabelSmoothing_MNIST.ipynb",
+         "rng": "02_NoisyMitigation_using_LabelSmoothing_MNIST.ipynb",
+         "noise_idxs": "02_NoisyMitigation_using_LabelSmoothing_MNIST.ipynb",
+         "mnist": "02_NoisyMitigation_using_LabelSmoothing_MNIST.ipynb",
+         "dls": "02_NoisyMitigation_using_LabelSmoothing_MNIST.ipynb",
+         "learn": "02_NoisyMitigation_using_LabelSmoothing_MNIST.ipynb",
+         "val_ordered_label_errors": "02_NoisyMitigation_using_LabelSmoothing_MNIST.ipynb"}
 
-modules = ["noisyimagenette.py"]
+modules = ["noisyimagenette.py",
+           "labelsmoothing.py"]
 
 doc_url = "https://manisnesan.github.io/fsdl/"
 
