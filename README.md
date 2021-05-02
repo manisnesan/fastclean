@@ -1,5 +1,5 @@
-# Project name here
-> fastclean - Experiments to find incorrect labels in the dataset and noisy training
+# fastclean
+> Experiments to find incorrect labels in the dataset and noisy training
 
 ## Notebooks
 
