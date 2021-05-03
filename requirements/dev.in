@@ -4,6 +4,7 @@ jupyterlab
 nbdev
 cleanlab
 wwf
+fastai
 
 black
 pycodestyle
