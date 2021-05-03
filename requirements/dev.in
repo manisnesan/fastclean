@@ -6,6 +6,7 @@ cleanlab
 wwf
 fastai
 
+
 black
 pycodestyle
 pydocstyle
@@ -14,3 +15,4 @@ pytest
 pyyaml
 
 wandb
+click
