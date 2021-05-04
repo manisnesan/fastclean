@@ -1,3 +1,7 @@
+# Script that performs training of noisy imagenette dataset 
+# and returns the predictions and confidence scores of the 
+# validation dataset.
+
 from fastai.vision.all import *
 from cleanlab.pruning import get_noise_indices
 from pathlib import Path
@@ -53,7 +57,7 @@ def train(dls: DataLoaders, filename: str='export.pkl') -> Learner:
     ''' 
     learn = cnn_learner(dls, resnet18, metrics=[accuracy, RocAuc()], loss_func=LabelSmoothingCrossEntropyFlat())
     
-    learn.fine_tune(epochs=5, base_lr=1e-3, freeze_epochs=3)
+    learn.fine_tune(epochs=1, base_lr=1e-3, freeze_epochs=1)
 
     learn.export(filename)
 
