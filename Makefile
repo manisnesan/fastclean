@@ -10,7 +10,7 @@ conda-update:
 # Compile exact pip packages
 pip-tools:
 	pip install pip-tools
-	pip-compile requirements/prod.in && pip-compile requirements/dev.in
+	pip-compile --find-links=https://download.pytorch.org/whl/torch_stable.html requirements/prod.in && pip-compile --find-links=https://download.pytorch.org/whl/torch_stable.html requirements/dev.in
 	pip-sync requirements/prod.txt requirements/dev.txt
 
 # Example training command
