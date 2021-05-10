@@ -4,6 +4,7 @@
 
 from fastai.vision.all import *
 from fastai.callback.wandb import *
+from fastcore.basics import *
 from cleanlab.pruning import get_noise_indices
 from pathlib import Path
 
@@ -15,9 +16,6 @@ import wandb
 # [] Refactor the FILENAME used for loading the data
 
 MODELS = './models'
-# Wandb init
-wandb.init(project="fsdl-noisylabel")
-
 # Default Config
 config = dict(
     base_lr=1e-3,
@@ -25,7 +23,9 @@ config = dict(
     freeze_epochs=3,
     seed=42,
 )
-wandb.config.update(config)
+# Wandb init
+wandb.init(project="fsdl-noisylabel", config=config)
+cfg = AttrDict(wandb.config)
 
 # Ensuring the script is reproducible
 set_seed(42, reproducible=True)
