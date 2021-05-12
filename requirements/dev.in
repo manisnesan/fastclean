@@ -6,6 +6,7 @@ cleanlab
 wwf
 torch==1.7.1+cu110
 fastai
+streamlit
 
 
 black
