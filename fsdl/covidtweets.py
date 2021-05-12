@@ -14,10 +14,13 @@ MODELS = "./models"
 
 config = dict(
     SEED=42,
-    lm_epoch=2,
-    lm_lr=4e-2,
-    lm_encoder_path=f"{MODELS}/awd_lstm_fine_tuned_enc",
     bs=64,
+    clf_epoch=10,
+    clf_lr=8e-4,
+    lm_epoch=3,
+    lm_lr=4e-2,
+    lm_encoder_name=f"awd_lstm_fine_tuned_enc",
+    model_name='covid_base.pkl',
 )
 
 # Wandb init
@@ -58,7 +61,7 @@ def clean_text(word):
     return word.strip()
 
 
-def load_data(path):
+def load_data(path: Path):
     covid = path
     # Load all training, dev, test and private test set.
     train_df = pd.read_csv(covid / "train.tsv", delimiter="\t")
@@ -83,7 +86,7 @@ def prepare(all_df):
 
 
 @click.command()
-@click.argument("data_path", default="../data/covid", type=click.Path())
+@click.argument("data_path", default="./data/covid", type=click.Path())
 @click.argument("is_lm", default=True, type=click.BOOL)
 def run(data_path, is_lm):
 
@@ -91,7 +94,7 @@ def run(data_path, is_lm):
 
     # Loading the data
     logging.info('Loading the data...')
-    data: List[pd.DataFrame] = load_data(data_path)
+    data: List[pd.DataFrame] = load_data(Path(data_path))
     train_df = data[0]
     valid_df = data[1]
 
@@ -99,18 +102,23 @@ def run(data_path, is_lm):
     train_df["is_valid"] = False
     valid_df["is_valid"] = True
     train_val = pd.concat([train_df, valid_df])
+    train_val = remove_stop_add_hashtag(train_val)
 
     all_df = pd.concat(data)
     all_df = remove_stop_add_hashtag(all_df)
 
-    # Language Model
-    if is_lm:
-        dls_lm = TextDataLoaders.from_df(
+    dls_lm = TextDataLoaders.from_df(
             all_df, seed=cfg.SEED, text_col=["HashTag", "Text"], is_lm=True
         )
-        lang_learn = language_model_learner(dls_lm, AWD_LSTM, metrics=Perplexity())
-        lang_learn.fine_tune(cfg.lm_epoch, 4e-2)
-        lang_learn.save_encoder(cfg.lm_encoder_path)
+    # Language Model
+    if is_lm:
+        logging.info('Training the language model ...')
+        lang_learn = language_model_learner(dls_lm, AWD_LSTM, metrics=[Perplexity(), accuracy], model_dir=MODELS,
+                                            cbs=[WandbCallback(log_preds=False, log_model=False), 
+                                                SaveModelCallback(fname=f'language_model')])
+        lang_learn.fine_tune(cfg.lm_epoch, cfg.lm_lr)
+        logging.info(f'Saving the encoder from language model with the name {cfg.lm_encoder_name}')
+        lang_learn.save_encoder(cfg.lm_encoder_name)
     else:
         # dls_lm = torch.load('SAVED_DATALOADER')
         # load the saved language learner
@@ -128,8 +136,16 @@ def run(data_path, is_lm):
         get_y=ColReader("Label"),
         splitter=ColSplitter(col="is_valid"),
     ).dataloaders(train_val, bs=cfg.bs)
-    learn = text_classifier_learner(dls_cls, AWD_LSTM, metrics=[accuracy, F1Score()], loss_func=CrossEntropyLossFlat())
-    learn.load_encoder(cfg.lm_encoder_path)
-    learn.fine_tune(1)
+    
+    logging.info('Training the classifier ...')
+    learn = text_classifier_learner(dls_cls, AWD_LSTM, metrics=[error_rate, F1Score()], loss_func=CrossEntropyLossFlat(), model_dir=MODELS,
+                                            cbs=[WandbCallback(log_preds=False, log_model=False), 
+                                                 SaveModelCallback(fname='classifier')])
+    learn.load_encoder(cfg.lm_encoder_name)
+    learn.fine_tune(cfg.clf_epoch, cfg.clf_lr)
 
-    learn.save('base')
+    logging.info(f'Saving the classifier model {cfg.model_name}')
+    learn.export(f'{MODELS}/{cfg.model_name}')
+
+if __name__ == '__main__':
+    run()
