@@ -2,6 +2,7 @@ from pathlib import Path
 from fastai.text.all import *
 from fastai.callback.wandb import *
 from fastcore.basics import AttrDict
+from cleanlab.pruning import get_noise_indices
 
 from typing import List
 
@@ -24,8 +25,9 @@ config = dict(
 )
 
 # Wandb init
-wandb.init(project="fsdl-noisylabel-covidtweets", config=config)
-cfg = AttrDict(wandb.config)
+# wandb.init(project="fsdl-noisylabel-covidtweets", config=config)
+# cfg = AttrDict(wandb.config)
+cfg = AttrDict(config)
 
 # Logging init
 # Basic Logger
@@ -39,6 +41,12 @@ def extract_hashtag(text):
     else:
         return "NA"
 
+def preprocess(text):
+    stop_words = ["HTTPURL", "@USER"]
+    clean_text = " ".join([each for each in text.split(" ") if each not in stop_words])
+
+    hash_tags = re.findall(r"#(\S+)", clean_text)
+    f'{" ".join(hash_tags)} {clean_text}' 
 
 def remove_stop_add_hashtag(df):
     stop_words = ["HTTPURL", "@USER"]
@@ -88,13 +96,24 @@ def prepare(all_df):
 @click.command()
 @click.argument("data_path", default="./data/covid", type=click.Path())
 @click.argument("is_lm", default=True, type=click.BOOL)
-def run(data_path, is_lm):
+@click.option("--mode", default='train', type=click.STRING)
+def run(data_path, mode, is_lm):
+
+    if mode == 'predict':
+        return predict(text)
 
     logging.info(f"Default config : {json.dumps(config)}")  
 
-    # Loading the data
+    # Loading the data    
     logging.info('Loading the data...')
     data: List[pd.DataFrame] = load_data(Path(data_path))
+
+    # Evaluation
+    if mode == 'eval':
+        evaluate(data[2], data_path)
+        return
+
+    # Training 
     train_df = data[0]
     valid_df = data[1]
 
@@ -146,6 +165,55 @@ def run(data_path, is_lm):
 
     logging.info(f'Saving the classifier model {cfg.model_name}')
     learn.export(f'{MODELS}/{cfg.model_name}')
+
+
+def predict(text):
+
+    # load the saved model
+    learn = load_learner(f'{MODELS}/{cfg.model_name}')
+
+    clas, clas_idx, probs = learn.predict(tokenize1(text, tok=WordTokenizer()))
+    return clas
+
+def evaluate(df, data_path):
+
+    # preprocess test data
+    test_df = remove_stop_add_hashtag(df)
+
+    # tokenize 
+    tokenized_df = tokenize_df(test_df, text_cols=["HashTag", "Text"], mark_fields=True, tok_text_col='text') #returns a tuple
+
+    # load the saved model
+    learn = load_learner(f'{MODELS}/{cfg.model_name}')
+
+    # test dataloader
+    test_dl = learn.dls.test_dl(tokenized_df[0])
+
+    # predictions
+    result = learn.get_preds(dl=test_dl)
+
+    confidence = torch.max(result[0], axis=1).values
+    _, y = learn.dls.valid.vocab
+    y_predicted = np.array(y[result[0].argmax(axis=1)])
+
+    test_df['predicted'] = y_predicted
+    test_df['confidence'] = confidence
+
+    # metrics
+    # _, metric_value = learn.validate(dl=test_dl) #loss, metrics used
+    # metrics = {each.name: metric_value[idx] for idx, each in enumerate(learn.metrics)}
+    # print(f"Metrics on the test dataset : {metrics}")
+
+    # Noisy Labels on Test Dataframe
+    test_ordered_label_errors = get_noise_indices(s=Numericalize(vocab=['INFORMATIVE', 'UNINFORMATIVE'])(test_df.Label).numpy(), 
+                                         psx=result[0].numpy(),
+                                         prune_method="both", # 'prune_by_noise_rate': works by removing examples with *high probability* of being mislabeled for every non-diagonal in the prune_counts_matrix (see pruning.py).
+                                                              #'prune_by_class': works by removing the examples with *smallest probability* of belonging to their given class label for every class.
+                                         sorted_index_method='normalized_margin')
+
+    print(test_ordered_label_errors)
+    test_df.iloc[test_ordered_label_errors].to_csv(f'{data_path}/noisy_text.csv')
+
 
 if __name__ == '__main__':
     run()
