@@ -136,6 +136,8 @@ def main(output_filepath, noice_pct):
     # Noisy indices from training dataset.
     train_ordered_label_errors = get_noise_indices(s=train_preds[1].numpy(), #targets
                              psx=train_preds[0].numpy(),#predictions_prob
+                             prune_method="both", # 'prune_by_noise_rate': works by removing examples with *high probability* of being mislabeled for every non-diagonal in the prune_counts_matrix (see pruning.py).
+                                                              #'prune_by_class': works by removing the examples with *smallest probability* of belonging to their given class label for every class.
                              sorted_index_method='normalized_margin')
 
     # Actual Noise in the training dataset
