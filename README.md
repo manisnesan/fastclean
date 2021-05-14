@@ -30,11 +30,17 @@ Pruning could be based on 1. Confident Examples that are labelled correctly with
 
 ## Takeaways
 
+Pretrained Model as effective feature extractors +  Gradual Unfreezing + Label Smoothing
 
+![img](./assets/step-1.jpg)
+
+### Ensure Clean Test data & Reduce noise impact on train data with Pseudo Labeling
+
+![img](./assets/step2.jpg)
 
 ## Notebooks
 
-- 01 - Training using Noisy Imagenette[1], a noisy version of fastai Imagenette. 
+- 01 - Training using Noisy Imagenette[1], a noisy version of fastai Imagenette.
   - In this notebook noisy imagenette is used to perform experiments and compare the techniques on various noise levels ranging 1/5/25/50 percent levels. This contains a subset of images from Imagenet on 10 different classes. Please refer[1] on the generation of noisy labels. In order to effectively compare the evaluation, the validation set is clean & the labels are not changed.
   - Training using Resnet 18 and Resnet 34 with Gradual Unfreezing.
   - Detecting Noise Indices in the training data using Confident Learning using Cleanlab [2]
