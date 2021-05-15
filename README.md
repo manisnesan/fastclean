@@ -26,7 +26,7 @@ Pruning could be based on 1. Confident Examples that are labelled correctly with
 
 - Targeted Pseudo Labeling : Noisy Samples identified with high confidence can be reused with their predictions as pseudolabels (Confident Errors).  
   
-- Integrating cleanlab with fasti Interpretation module[4] for reviewing the noisy labels present in train, valid and test.
+- Integrating cleanlab with fastai Interpretation module[4](https://docs.fast.ai/interpret.html) for reviewing the noisy labels present in train, valid and test.
 
 ## Takeaways
 
@@ -38,16 +38,28 @@ Pretrained Model as effective feature extractors +  Gradual Unfreezing + Label S
 
 ![img](./assets/step2.jpg)
 
+## Datasets
+
+- Experiments are conducted for classification tasks in vision and text.
+
+### Noisy Imagenette
+
+ This contains a subset of images from Imagenet on 10 different classes. Please refer[1] on the generation of noisy labels. In order to effectively compare the evaluation, the validation set is clean & the labels are not changed.
+
+### Covid Tweets (Noisy User Generated Text)
+
+  The dataset from WNUT-2020 Task 2: Identification of informative COVID-19 English Tweets is used to evaluate the noisy samples identification from the test set. The goal of the task is to automatically identify whether an English Tweet related to the novel coronavirus (COVID-19) is informative or not. Such informative Tweets provide information about recovered, suspected, confirmed and death cases as well as location or travel history of the cases.
+
 ## Notebooks
 
 - 01 - Training using Noisy Imagenette[1], a noisy version of fastai Imagenette.
-  - In this notebook noisy imagenette is used to perform experiments and compare the techniques on various noise levels ranging 1/5/25/50 percent levels. This contains a subset of images from Imagenet on 10 different classes. Please refer[1] on the generation of noisy labels. In order to effectively compare the evaluation, the validation set is clean & the labels are not changed.
-  - Training using Resnet 18 and Resnet 34 with Gradual Unfreezing.
+  - In this notebook noisy imagenette is used to perform experiments and compare the techniques on various noise levels ranging 1/5/25/50 percent levels
+  - Training using Resnet 18 and Resnet 34 with Gradual Unfreezing using fastai.
   - Detecting Noise Indices in the training data using Confident Learning using Cleanlab [2]
   - Pseudo Labeling using High Confident Predictions as soft targets
 - 02 - Training MNIST with LabelSmoothing using CleanLab and reproduce the result.
 - 03 - Text Classification on Covid Tweets to identify the informativeness. We wanted to identify the noisy labels present in the test set.
-  - The dataset from WNUT-2020 Task 2: Identification of informative COVID-19 English Tweets is used to evaluate the noisy samples identification from the test set. The goal of the task is to automatically identify whether an English Tweet related to the novel coronavirus (COVID-19) is informative or not. Such informative Tweets provide information about recovered, suspected, confirmed and death cases as well as location or travel history of the cases.
+  
 - 04 - Integrate fastai Intepretation module with cleanlab to identify and review the noisy labels in training, validation and test dataset.
 
 ## Scripts
@@ -94,7 +106,7 @@ covid
 
 ## Experiments
 
-### Noisy Imagenette
+### NoisyImagenette
 
 - Resnet 34 Pretrained with ImageNet
 - Experiment Tracking using Weights & Biases
@@ -107,13 +119,15 @@ covid
 | 25% | 2122 | **2177** | 2023 | 2217 | 2140 |
 | 50% | 4092 | 4256 | **4132** | 4257 | 4151 |
 
-## StreamLit
+### StreamLit Demo for Noisy Tweets
 
-- ![Watch the demo of Covid Informativeness on Noisy Tweet Predictions](./assert)
+- Demo of Covid Informativeness on Noisy Tweet Predictions is available in assets directory [streamlit-st_app-2021-05-12-16-05-67.webm](./assets/streamlit-st_app-2021-05-12-16-05-67.webm).
 
 ## References
 
 - [1] [Introducing Noisy Imagenette](https://tmabraham.github.io/blog/noisy_imagenette)
-- [2] Confident Learning: Estimate Uncertainty in Dataset Labels
+- [2] [Confident Learning: Estimate Uncertainty in Dataset Labels](https://arxiv.org/abs/1911.00068)
 - [3] [WNUT-2020 Task 2: Identification of informative COVID-19 English Tweets](https://competitions.codalab.org/competitions/25845)
 - [4] [Interpretation of Predictions](https://docs.fast.ai/interpret.html)
+- [5] [An Introduction to Confident Learning: Finding and Learning with Label Errors in Datasets](https://l7.curtisnorthcutt.com/confident-learning)
+- [6] [Pervasive Label Errors in ML Datasets Destabilize Benchmarks](https://l7.curtisnorthcutt.com/label-errors)
