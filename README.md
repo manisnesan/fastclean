@@ -109,7 +109,7 @@ covid
 ### NoisyImagenette
 
 - Resnet 34 Pretrained with ImageNet
-- Experiment Tracking using Weights & Biases
+- Experiment Tracking using Weights & Biases [Link](https://wandb.ai/manisnesan/fsdl-noisylabel)
 
 ![image](./assets/metrics_labelsmoothing_crossentropy.jpg)
 
